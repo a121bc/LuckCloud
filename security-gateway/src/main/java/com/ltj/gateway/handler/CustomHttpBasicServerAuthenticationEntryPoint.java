@@ -1,17 +1,22 @@
 package com.ltj.gateway.handler;
 
-import com.google.gson.JsonObject;
-import com.ltj.gateway.response.MessageCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ltj.gateway.response.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.server.authentication.HttpBasicServerAuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+//import com.ltj.gateway.response.MessageCode;
 
 @Component
 public class CustomHttpBasicServerAuthenticationEntryPoint extends HttpBasicServerAuthenticationEntryPoint /* implements ServerAuthenticationEntryPoint */{
@@ -24,7 +29,8 @@ public class CustomHttpBasicServerAuthenticationEntryPoint extends HttpBasicServ
     public CustomHttpBasicServerAuthenticationEntryPoint() {
     }
 
-
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     public void setRealm(String realm) {
@@ -33,20 +39,28 @@ public class CustomHttpBasicServerAuthenticationEntryPoint extends HttpBasicServ
 
     private static String createHeaderValue(String realm) {
         Assert.notNull(realm, "realm cannot be null");
-        return String.format(WWW_AUTHENTICATE_FORMAT, new Object[]{realm});
+        return String.format(WWW_AUTHENTICATE_FORMAT, realm);
     }
 
     @Override
-    public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException e) {
-            ServerHttpResponse response = exchange.getResponse();
-            response.setStatusCode(HttpStatus.UNAUTHORIZED);
-            response.getHeaders().add("Content-Type", "application/json; charset=UTF-8");
-            response.getHeaders().set(HttpHeaders.AUTHORIZATION, this.headerValue);
-            JsonObject result = new JsonObject();
-            result.addProperty("status", MessageCode.COMMON_AUTHORIZED_FAILURE.getCode());
-            result.addProperty("message", MessageCode.COMMON_AUTHORIZED_FAILURE.getMsg());
-            byte[] dataBytes=result.toString().getBytes();
-            DataBuffer bodyDataBuffer = response.bufferFactory().wrap(dataBytes);
-            return response.writeWith(Mono.just(bodyDataBuffer));
+    public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException authException) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        response.getHeaders().add("Content-Type", "application/json; charset=UTF-8");
+        response.getHeaders().set(HttpHeaders.AUTHORIZATION, this.headerValue);
+        /*JsonObject result = new JsonObject();
+        result.addProperty("status", MessageCode.COMMON_AUTHORIZED_FAILURE.getCode());
+        result.addProperty("message", MessageCode.COMMON_AUTHORIZED_FAILURE.getMsg());*/
+
+        Result result = Result.error401("无效的token！", authException.getMessage());
+
+        byte[] dataBytes= new byte[0];
+        try {
+            dataBytes = mapper.writeValueAsString(result).getBytes();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        DataBuffer bodyDataBuffer = response.bufferFactory().wrap(dataBytes);
+        return response.writeWith(Mono.just(bodyDataBuffer));
     }
 }

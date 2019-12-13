@@ -1,10 +1,9 @@
 package com.ltj.gateway.handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonObject;
 import com.ltj.gateway.entity.AuthUserDetails;
-import com.ltj.gateway.response.MessageCode;
-import com.ltj.gateway.response.WsResponse;
+import com.ltj.gateway.response.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +26,9 @@ public class AuthenticationSuccessHandler extends WebFilterChainServerAuthentica
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication){
         ServerWebExchange exchange = webFilterExchange.getExchange();
@@ -36,24 +38,33 @@ public class AuthenticationSuccessHandler extends WebFilterChainServerAuthentica
         httpHeaders.add("Content-Type", "application/json; charset=UTF-8");
         httpHeaders.add("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         //设置body
-        WsResponse wsResponse = WsResponse.success();
+//        WsResponse wsResponse = WsResponse.success();
+
         byte[] dataBytes={};
-        ObjectMapper mapper = new ObjectMapper();
+        Result result;
         try {
             User user=(User)authentication.getPrincipal();
             AuthUserDetails userDetails=buildUser(user);
             byte[] authorization=(userDetails.getUsername()+":"+userDetails.getPassword()).getBytes();
             String token= Base64.getEncoder().encodeToString(authorization);
             httpHeaders.add(HttpHeaders.AUTHORIZATION, token);
-            wsResponse.setResult(userDetails);
-            dataBytes=mapper.writeValueAsBytes(wsResponse);
+            userDetails.setToken(token);
+            /*wsResponse.setResult(userDetails);
+            dataBytes=mapper.writeValueAsBytes(wsResponse);*/
+            result = Result.success("登录成功",userDetails);
+            dataBytes=mapper.writeValueAsBytes(result);
         }
         catch (Exception ex){
             ex.printStackTrace();
-            JsonObject result = new JsonObject();
+            /*JsonObject result = new JsonObject();
             result.addProperty("status", MessageCode.COMMON_FAILURE.getCode());
-            result.addProperty("message", "授权异常");
-            dataBytes=result.toString().getBytes();
+            result.addProperty("message", "授权异常");*/
+            result = Result.error401("授权异常",ex.getMessage());
+            try {
+                dataBytes=mapper.writeValueAsBytes(result);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
         DataBuffer bodyDataBuffer = response.bufferFactory().wrap(dataBytes);
         return response.writeWith(Mono.just(bodyDataBuffer));

@@ -1,8 +1,8 @@
 package com.ltj.gateway.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ltj.gateway.response.MessageCode;
-import com.ltj.gateway.response.WsResponse;
+import com.ltj.gateway.response.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -16,8 +16,11 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthenticationFaillHandler  implements ServerAuthenticationFailureHandler {
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Override
-    public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException e) {
+    public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException authException) {
         ServerWebExchange exchange = webFilterExchange.getExchange();
         ServerHttpResponse response = exchange.getResponse();
         //设置headers
@@ -25,11 +28,11 @@ public class AuthenticationFaillHandler  implements ServerAuthenticationFailureH
         httpHeaders.add("Content-Type", "application/json; charset=UTF-8");
         httpHeaders.add("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         //设置body
-        WsResponse<String> wsResponse = WsResponse.failure(MessageCode.COMMON_AUTHORIZED_FAILURE);
-        byte[]   dataBytes={};
+//        WsResponse<String> wsResponse = WsResponse.failure(MessageCode.COMMON_AUTHORIZED_FAILURE);
+        Result result = Result.error401("用户名或密码错误，请重新输入！", authException.getMessage());
+        byte[] dataBytes={};
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            dataBytes=mapper.writeValueAsBytes(wsResponse);
+            dataBytes=mapper.writeValueAsBytes(result);
         }
         catch (Exception ex){
             ex.printStackTrace();
