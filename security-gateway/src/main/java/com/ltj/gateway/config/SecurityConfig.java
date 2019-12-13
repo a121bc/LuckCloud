@@ -3,10 +3,12 @@ package com.ltj.gateway.config;
 import com.ltj.gateway.handler.AuthenticationFaillHandler;
 import com.ltj.gateway.handler.AuthenticationSuccessHandler;
 import com.ltj.gateway.handler.CustomHttpBasicServerAuthenticationEntryPoint;
+import com.ltj.gateway.jwt.JwtAuthenticationTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +25,8 @@ public class SecurityConfig {
     private AuthenticationFaillHandler authenticationFaillHandler;
     @Autowired
     private CustomHttpBasicServerAuthenticationEntryPoint customHttpBasicServerAuthenticationEntryPoint;
+    @Autowired
+    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
 
     //security的鉴权排除列表
@@ -51,6 +55,7 @@ public class SecurityConfig {
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .csrf().disable()//必须支持跨域
                 .logout().disable();
+        http.addFilterAt(jwtAuthenticationTokenFilter, SecurityWebFiltersOrder.FORM_LOGIN);
 
         return http.build();
     }
