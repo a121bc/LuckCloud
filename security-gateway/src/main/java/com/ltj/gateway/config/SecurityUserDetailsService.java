@@ -16,10 +16,10 @@ import reactor.core.publisher.Mono;
 public class SecurityUserDetailsService implements ReactiveUserDetailsService {
 
     @Value("${spring.security.user.name}")
-    private   String userName;
+    private String userName;
 
     @Value("${spring.security.user.password}")
-    private   String password;
+    private String password;
 
     @Autowired
     private PasswordEncoder passwordEncoder;

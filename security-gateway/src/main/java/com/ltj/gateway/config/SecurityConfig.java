@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 
 @EnableWebFluxSecurity
 public class SecurityConfig {
@@ -47,7 +48,9 @@ public class SecurityConfig {
                 .authenticationSuccessHandler(authenticationSuccessHandler) //认证成功
                 .authenticationFailureHandler(authenticationFaillHandler) //登陆验证失败
                 .and().exceptionHandling().authenticationEntryPoint(customHttpBasicServerAuthenticationEntryPoint)  //基于http的接口请求鉴权失败
-                .and() .csrf().disable()//必须支持跨域
+                .and()
+                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+                .csrf().disable()//必须支持跨域
                 .logout().disable();
 
         return http.build();
@@ -55,7 +58,8 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); //默认不加密
+//        return new BCryptPasswordEncoder();
+        return  NoOpPasswordEncoder.getInstance(); //默认不加密
     }
 
 

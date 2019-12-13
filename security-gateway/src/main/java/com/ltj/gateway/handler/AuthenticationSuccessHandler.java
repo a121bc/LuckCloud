@@ -22,7 +22,7 @@ import java.util.Base64;
 
 
 @Component
-public class AuthenticationSuccessHandler extends WebFilterChainServerAuthenticationSuccessHandler   {
+public class AuthenticationSuccessHandler extends WebFilterChainServerAuthenticationSuccessHandler {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -37,7 +37,7 @@ public class AuthenticationSuccessHandler extends WebFilterChainServerAuthentica
         httpHeaders.add("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         //设置body
         WsResponse wsResponse = WsResponse.success();
-       byte[]   dataBytes={};
+        byte[] dataBytes={};
         ObjectMapper mapper = new ObjectMapper();
         try {
             User user=(User)authentication.getPrincipal();
@@ -67,11 +67,5 @@ public class AuthenticationSuccessHandler extends WebFilterChainServerAuthentica
         userDetails.setPassword(passwordEncoder.encode(user.getPassword()));
         return userDetails;
     }
-
-
-
-
-
-
 
 }
