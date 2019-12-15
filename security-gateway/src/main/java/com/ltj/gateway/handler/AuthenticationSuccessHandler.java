@@ -1,5 +1,6 @@
 package com.ltj.gateway.handler;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ltj.gateway.entity.AuthUserDetails;
@@ -12,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.WebFilterExchange;
-import org.springframework.security.web.server.authentication.WebFilterChainServerAuthenticationSuccessHandler;
+import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -21,26 +22,19 @@ import java.util.Base64;
 
 
 @Component
-public class AuthenticationSuccessHandler extends WebFilterChainServerAuthenticationSuccessHandler {
+public class AuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private ObjectMapper mapper;
-
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication){
-        ServerWebExchange exchange = webFilterExchange.getExchange();
-        ServerHttpResponse response = exchange.getResponse();
+        ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
         //设置headers
         HttpHeaders httpHeaders = response.getHeaders();
         httpHeaders.add("Content-Type", "application/json; charset=UTF-8");
         httpHeaders.add("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
-        //设置body
-//        WsResponse wsResponse = WsResponse.success();
 
-        byte[] dataBytes={};
         Result result;
         try {
             User user=(User)authentication.getPrincipal();
@@ -49,24 +43,14 @@ public class AuthenticationSuccessHandler extends WebFilterChainServerAuthentica
             String token= Base64.getEncoder().encodeToString(authorization);
             httpHeaders.add(HttpHeaders.AUTHORIZATION, token);
             userDetails.setToken(token);
-            /*wsResponse.setResult(userDetails);
-            dataBytes=mapper.writeValueAsBytes(wsResponse);*/
             result = Result.success("登录成功",userDetails);
-            dataBytes=mapper.writeValueAsBytes(result);
         }
         catch (Exception ex){
             ex.printStackTrace();
-            /*JsonObject result = new JsonObject();
-            result.addProperty("status", MessageCode.COMMON_FAILURE.getCode());
-            result.addProperty("message", "授权异常");*/
             result = Result.error401("授权异常",ex.getMessage());
-            try {
-                dataBytes=mapper.writeValueAsBytes(result);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
         }
-        DataBuffer bodyDataBuffer = response.bufferFactory().wrap(dataBytes);
+        byte[] bytes = JSONObject.toJSONBytes(result);
+        DataBuffer bodyDataBuffer = response.bufferFactory().wrap(bytes);
         return response.writeWith(Mono.just(bodyDataBuffer));
     }
 

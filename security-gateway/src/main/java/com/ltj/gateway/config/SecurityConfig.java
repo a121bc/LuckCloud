@@ -1,26 +1,30 @@
 package com.ltj.gateway.config;
 
 import com.ltj.gateway.handler.AuthenticationFaillHandler;
-import com.ltj.gateway.handler.AuthenticationSuccessHandler;
 import com.ltj.gateway.handler.CustomHttpBasicServerAuthenticationEntryPoint;
 import com.ltj.gateway.jwt.JwtAuthenticationTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 
+@Configuration
 @EnableWebFluxSecurity
+@EnableReactiveMethodSecurity
 public class SecurityConfig {
 
 
     @Autowired
-    private AuthenticationSuccessHandler authenticationSuccessHandler;
+    private ServerAuthenticationSuccessHandler authenticationSuccessHandler;
     @Autowired
     private AuthenticationFaillHandler authenticationFaillHandler;
     @Autowired
@@ -30,7 +34,7 @@ public class SecurityConfig {
 
 
     //security的鉴权排除列表
-    private static final String[] EXCLUDED_AUTH_PAGES = {
+    private static final String[] AUTH_WHITELIST = {
             "/auth/login",
             "/auth/logout",
             "/health",
@@ -41,7 +45,7 @@ public class SecurityConfig {
     SecurityWebFilterChain webFluxSecurityFilterChain(ServerHttpSecurity http) throws Exception {
         http
                 .authorizeExchange()
-                .pathMatchers(EXCLUDED_AUTH_PAGES).permitAll()  //无需进行权限过滤的请求路径
+                .pathMatchers(AUTH_WHITELIST).permitAll()  //无需进行权限过滤的请求路径
                 .pathMatchers(HttpMethod.OPTIONS).permitAll() //option 请求默认放行
                 .anyExchange().authenticated()
                 .and()

@@ -1,14 +1,11 @@
 package com.ltj.gateway.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson.JSON;
 import com.ltj.gateway.response.Result;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.server.authentication.HttpBasicServerAuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -16,21 +13,13 @@ import org.springframework.util.Assert;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-//import com.ltj.gateway.response.MessageCode;
-
 @Component
 public class CustomHttpBasicServerAuthenticationEntryPoint extends HttpBasicServerAuthenticationEntryPoint /* implements ServerAuthenticationEntryPoint */{
 
-
-    private static final String WWW_AUTHENTICATE = "WWW-Authenticate";
-    private static final String DEFAULT_REALM = "Realm";
     private static String WWW_AUTHENTICATE_FORMAT = "Basic realm=\"%s\"";
     private String headerValue = createHeaderValue("Realm");
     public CustomHttpBasicServerAuthenticationEntryPoint() {
     }
-
-    @Autowired
-    private ObjectMapper mapper;
 
     @Override
     public void setRealm(String realm) {
@@ -48,18 +37,8 @@ public class CustomHttpBasicServerAuthenticationEntryPoint extends HttpBasicServ
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
         response.getHeaders().add("Content-Type", "application/json; charset=UTF-8");
         response.getHeaders().set(HttpHeaders.AUTHORIZATION, this.headerValue);
-        /*JsonObject result = new JsonObject();
-        result.addProperty("status", MessageCode.COMMON_AUTHORIZED_FAILURE.getCode());
-        result.addProperty("message", MessageCode.COMMON_AUTHORIZED_FAILURE.getMsg());*/
-
         Result result = Result.error401("无效的token！", authException.getMessage());
-
-        byte[] dataBytes= new byte[0];
-        try {
-            dataBytes = mapper.writeValueAsString(result).getBytes();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        byte[] dataBytes= JSON.toJSONBytes(result);
         DataBuffer bodyDataBuffer = response.bufferFactory().wrap(dataBytes);
         return response.writeWith(Mono.just(bodyDataBuffer));
     }
