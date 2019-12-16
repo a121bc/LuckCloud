@@ -27,7 +27,7 @@ public class SecurityUserDetailsService implements ReactiveUserDetailsService {
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-       //todo 预留调用数据库根据用户名获取用户
+        //todo 预留调用数据库根据用户名获取用户
         if(StringUtils.equals(userName,username)){
             UserDetails user = User.withUsername(userName)
                   .password(passwordEncoder.encode(password))

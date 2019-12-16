@@ -1,27 +1,18 @@
 package com.ltj.gateway.jwt;
 
 import com.ltj.gateway.service.IRedisService;
-import com.ltj.security.service.IRedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
-
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * @author: Liu Tian Jun
@@ -45,18 +36,18 @@ public class JwtAuthenticationTokenFilter implements WebFilter {
         ServerHttpRequest request = exchange.getRequest();
         // 获取 Request 中的请求头为 “ Authorization ” 的 token 值
 
-        String authHeader = request.getHeaders().getFirst(jwtTokenUtil.getTokenHeader());
+        String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         // 验证 值是否以"Bearer "开头
-        if (authHeader != null && authHeader.startsWith(jwtTokenUtil.getTokenHead())) {
+        if (authHeader != null && authHeader.startsWith("Bearer")) {
             // 截取token中"Bearer "后面的值，
-            String authToken = authHeader.substring(jwtTokenUtil.getTokenHead().length());
+            String authToken = authHeader.substring("Bearer ".length());
             // 获取用户账号
             String account = jwtTokenUtil.getUsernameFromToken(authToken);
             log.info("JwtAuthenticationTokenFilter[doFilterInternal] checking authentication {} ", account);
             // 验证用户账号是否合法
             if (account != null && SecurityContextHolder.getContext().getAuthentication() == null ) {
                 // 根据account去数据库中查询user数据，足够信任token的情况下，可以省略这一步
-                JwtUser userDetails = (JwtUser) redisService.getMapField(jwtTokenUtil.getTokenHeader(), account);
+                JwtUser userDetails = (JwtUser) redisService.getMapField(HttpHeaders.AUTHORIZATION, account);
                 if (jwtTokenUtil.validateToken(authToken, userDetails)) {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());

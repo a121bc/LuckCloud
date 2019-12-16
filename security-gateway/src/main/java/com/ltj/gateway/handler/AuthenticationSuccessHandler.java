@@ -43,7 +43,7 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
             String token= Base64.getEncoder().encodeToString(authorization);
             httpHeaders.add(HttpHeaders.AUTHORIZATION, token);
             userDetails.setToken(token);
-            result = Result.success("登录成功",userDetails);
+            result = Result.success("登录成功");
         }
         catch (Exception ex){
             ex.printStackTrace();
