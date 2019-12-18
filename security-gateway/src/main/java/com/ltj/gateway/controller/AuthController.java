@@ -1,10 +1,7 @@
 package com.ltj.gateway.controller;
 
-import com.ltj.gateway.response.Result;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 
 /**
  * @describe： 权限
@@ -17,9 +14,9 @@ import reactor.core.publisher.Flux;
 @RestController
 public class AuthController {
 
-    @PostMapping("/auth/login")
-    public Flux<Result> login() {
-        return Flux.just(Result.success("登录成功"));
-    }
+//    @PostMapping("/auth/login")
+//    public Flux<Result> login() {
+//        return Flux.just(Result.success("登录成功"));
+//    }
 
 }
