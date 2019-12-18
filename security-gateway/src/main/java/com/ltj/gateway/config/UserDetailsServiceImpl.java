@@ -12,8 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Liu Tian Jun
+ */
 @Component
-public class SecurityUserDetailsService implements ReactiveUserDetailsService {
+public class UserDetailsServiceImpl implements ReactiveUserDetailsService {
 
     @Value("${spring.security.user.name}")
     private String userName;
