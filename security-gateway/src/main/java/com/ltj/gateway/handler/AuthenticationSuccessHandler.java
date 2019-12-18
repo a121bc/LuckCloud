@@ -1,8 +1,10 @@
 package com.ltj.gateway.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ltj.gateway.cache.IRedisService;
 import com.ltj.gateway.jwt.JWTTokenService;
 import com.ltj.gateway.response.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -21,6 +23,9 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler {
 
+    @Autowired
+    private IRedisService redisService;
+
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication){
         ServerWebExchange exchange = webFilterExchange.getExchange();
@@ -30,6 +35,9 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
         headers.add("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         String token = getHttpAuthHeaderValue(authentication);
         headers.add(HttpHeaders.AUTHORIZATION, token);
+
+        redisService.putHashValue(HttpHeaders.AUTHORIZATION, authentication.getName(), authentication.getPrincipal());
+
         Result result = Result.success("登录成功");
         byte[] bytes = JSONObject.toJSONBytes(result);
         DataBuffer bodyDataBuffer = response.bufferFactory().wrap(bytes);
