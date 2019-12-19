@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ltj.gateway.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.ltj.gateway.entity.user.User" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="avatar" property="avatar" jdbcType="VARCHAR" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="mail" property="mail" jdbcType="VARCHAR" />
+        <result column="open_id" property="openId" jdbcType="VARCHAR" />
+        <result column="nickname" property="nickname" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="gender" property="gender" jdbcType="TINYINT" />
+        <result column="birthday" property="birthday" jdbcType="TIMESTAMP" />
+        <result column="state" property="state" jdbcType="TINYINT" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="up_time" property="upTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <resultMap id="UserVoMapper" type="com.ltj.gateway.entity.user.JwtUser">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="state" property="state" jdbcType="TINYINT" />
+        <collection property="roles" ofType="com.ltj.gateway.entity.role.Role">
+            <id column="rid" property="id" jdbcType="INTEGER" />
+            <result column="name" property="name" jdbcType="VARCHAR" />
+        </collection>
+    </resultMap>
+
+    <select id="findByUsername" resultMap="UserVoMapper">
+        SELECT
+            u.id,
+            u.username,
+            u.`password`,
+            u.state,
+            r.id AS rid,
+            r.`name`
+        FROM
+            `user` AS u
+            LEFT JOIN user_role AS ur ON u.id = ur.user_id
+            LEFT JOIN role AS r ON ur.role_id = r.id
+        WHERE
+            u.username = #{username}
+    </select>
+</mapper>
