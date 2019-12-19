@@ -30,8 +30,8 @@ import java.util.List;
 @Component
 public class RedisService implements IRedisService<String, Object> {
 
-    @Qualifier("reactiveRedisTemplate")
     @Autowired
+    @Qualifier("reactiveRedisTemplate")
     private ReactiveRedisTemplate redisTemplate;
 
     private static final String LOCK_KEY_PREFIX = "lock_";

@@ -35,9 +35,7 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
         headers.add("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         String token = getHttpAuthHeaderValue(authentication);
         headers.add(HttpHeaders.AUTHORIZATION, token);
-
-        redisService.putHashValue(HttpHeaders.AUTHORIZATION, authentication.getName(), authentication.getPrincipal());
-
+        redisService.putHashValue(HttpHeaders.AUTHORIZATION, authentication.getName(), token).subscribe();
         Result result = Result.success("登录成功");
         byte[] bytes = JSONObject.toJSONBytes(result);
         DataBuffer bodyDataBuffer = response.bufferFactory().wrap(bytes);
