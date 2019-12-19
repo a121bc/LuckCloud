@@ -1,0 +1,11 @@
+# 网络映射
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: service-provider
+        uri: lb://service-provider
+        predicates:
+        - Path=/api/**
+        filters:
+        - StripPrefix=1
