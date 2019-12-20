@@ -33,6 +33,7 @@ public class GatewayRoute extends BaseEntity {
     private String filters;
 
     /* 顺序 */
+    @TableField("`order`")
     private String order;
 
     /* 创建人 */
