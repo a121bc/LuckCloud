@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import reactor.core.publisher.Mono;
 
 /**
  * @author: LIU Tian Jun
@@ -22,10 +23,10 @@ public class GlobalExceptionController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public Result handleHttpMessageNotReadableException(
+    public Mono<Result> handleHttpMessageNotReadableException(
             HttpMessageNotReadableException e) {
         log.error("could_not_read_json... {}", e.getMessage());
-        return Result.error500("请求参数不正确", e.getMessage());
+        return Mono.just(Result.error500("请求参数不正确", e.getMessage()));
     }
 
     /**
@@ -33,17 +34,17 @@ public class GlobalExceptionController {
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({MethodArgumentNotValidException.class})
-    public Result handleValidationException(MethodArgumentNotValidException e) {
+    public Mono<Result> handleValidationException(MethodArgumentNotValidException e) {
         log.error("parameter_validation_exception... ", e);
-        return Result.error400("请求类型不支持！", e.getMessage());
+        return Mono.just(Result.error400("请求类型不支持！", e.getMessage()));
     }
 
     // 捕捉其他所有异常
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Result globalException(Exception e) {
+    public Mono<Result> globalException(Exception e) {
         log.error("other error... ", e);
-        return Result.error500(e.getMessage(), e.getCause().toString());
+        return Mono.just(Result.error500(e.getMessage(), e.getCause().toString()));
     }
 
 }

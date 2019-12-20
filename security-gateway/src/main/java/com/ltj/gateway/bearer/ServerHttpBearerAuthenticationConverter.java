@@ -35,27 +35,13 @@ public class ServerHttpBearerAuthenticationConverter implements ServerAuthentica
     @Autowired
     private JWTCustomVerifier jwtVerifier;
 
-    @Autowired
-    private IRedisService redisService;
-
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {
-        Mono<String> filter = Mono.justOrEmpty(exchange)
-                .flatMap(AuthorizationHeaderPayload::extract)
-                .filter(matchBearerLength);
         return Mono.justOrEmpty(exchange)
-                .flatMap(AuthorizationHeaderPayload::extract)
-                .filter(matchBearerLength).flatMap(isolateBearerValue)
-                .flatMap(jwtVerifier::check)
-                .flatMap(UsernamePasswordAuthenticationBearer::create)
-                .filter(e ->filter.equals(redisService.getHashValue(HttpHeaders.AUTHORIZATION,e.getName())));
-
-
-        /*return Mono.justOrEmpty(exchange)
                 .flatMap(AuthorizationHeaderPayload::extract)
                 .filter(matchBearerLength)
                 .flatMap(isolateBearerValue)
                 .flatMap(jwtVerifier::check)
-                .flatMap(UsernamePasswordAuthenticationBearer::create).log();*/
+                .flatMap(UsernamePasswordAuthenticationBearer::create).log();
     }
 }

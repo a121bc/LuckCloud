@@ -33,8 +33,8 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
         HttpHeaders headers = response.getHeaders();
         headers.add("Content-Type", "application/json; charset=UTF-8");
         headers.add("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
-        String token = getHttpAuthHeaderValue(authentication);
-        headers.add(HttpHeaders.AUTHORIZATION, token);
+        String token = tokenFromAuthentication(authentication);
+        headers.add(HttpHeaders.AUTHORIZATION, getHttpAuthHeaderValue(token));
         redisService.putHashValue(HttpHeaders.AUTHORIZATION, authentication.getName(), token).subscribe();
         Result result = Result.success("登录成功");
         byte[] bytes = JSONObject.toJSONBytes(result);
@@ -42,8 +42,8 @@ public class AuthenticationSuccessHandler implements ServerAuthenticationSuccess
         return response.writeWith(Mono.just(bodyDataBuffer));
     }
 
-    private static String getHttpAuthHeaderValue(Authentication authentication){
-        return String.join(" ","Bearer",tokenFromAuthentication(authentication));
+    private static String getHttpAuthHeaderValue(String token){
+        return String.join(" ","Bearer",token);
     }
 
     private static String tokenFromAuthentication(Authentication authentication){

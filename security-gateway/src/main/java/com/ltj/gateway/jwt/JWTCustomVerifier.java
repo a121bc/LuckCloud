@@ -19,16 +19,21 @@
  */
 package com.ltj.gateway.jwt;
 
+import com.ltj.gateway.cache.IRedisService;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.SignedJWT;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 /**
@@ -47,15 +52,42 @@ public class JWTCustomVerifier {
         this.jwsVerifier = this.buildJWSVerifier();
     }
 
+    @Autowired
+    private IRedisService redisService;
+
     public Mono<SignedJWT> check(String token) {
-        return Mono.justOrEmpty(createJWS(token))
+        SignedJWT jws = createJWS(token);
+        String subject = null;
+        try {
+            subject = jws.getJWTClaimsSet().getSubject();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return redisService.getHashValue(HttpHeaders.AUTHORIZATION, subject)
+                .filter(token::equals)
+                .map(t -> createJWS((String) t))
                 .filter(isNotExpired)
                 .filter(validSignature);
+
     }
 
+    /**
+     * @Description 验证token是否过期
+     * @param null
+     * @return
+     * @author Liu Tian Jun
+     * @date 09:07 2019-12-20 0020
+     **/
     private Predicate<SignedJWT> isNotExpired = token ->
             getExpirationDate(token).after(Date.from(Instant.now()));
 
+    /**
+     * @Description 验证签名是否有效
+     * @param null
+     * @return
+     * @author Liu Tian Jun
+     * @date 09:07 2019-12-20 0020
+     **/
     private Predicate<SignedJWT> validSignature = token -> {
         try {
             return token.verify(this.jwsVerifier);
