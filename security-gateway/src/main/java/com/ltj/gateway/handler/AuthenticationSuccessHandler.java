@@ -3,7 +3,7 @@ package com.ltj.gateway.handler;
 import com.alibaba.fastjson.JSONObject;
 import com.ltj.gateway.cache.IRedisService;
 import com.ltj.gateway.jwt.JWTTokenService;
-import com.ltj.gateway.response.Result;
+import com.ltj.gateway.entity.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;

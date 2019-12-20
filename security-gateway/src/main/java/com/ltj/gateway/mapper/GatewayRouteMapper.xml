@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ltj.gateway.mapper.GatewayRouteMapper">
+    <resultMap id="BaseResultMap" type="com.ltj.gateway.entity.gateway_route.GatewayRoute" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="service_id" property="serviceId" jdbcType="VARCHAR" />
+        <result column="state" property="state" jdbcType="INTEGER" />
+        <result column="uri" property="uri" jdbcType="VARCHAR" />
+        <result column="predicates" property="predicates" jdbcType="VARCHAR" />
+        <result column="filters" property="filters" jdbcType="VARCHAR" />
+        <result column="order" property="order" jdbcType="VARCHAR" />
+        <result column="creator_id" property="creatorId" jdbcType="INTEGER" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="updater_id" property="updaterId" jdbcType="INTEGER" />
+        <result column="up_time" property="upTime" jdbcType="TIMESTAMP" />
+        <result column="remarks" property="remarks" jdbcType="VARCHAR" />
+    </resultMap>
+</mapper>

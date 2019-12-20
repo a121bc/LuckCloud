@@ -1,6 +1,6 @@
 package com.ltj.gateway.common;
 
-import com.ltj.gateway.response.Result;
+import com.ltj.gateway.entity.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;

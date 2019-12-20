@@ -1,4 +1,4 @@
-package com.ltj.gateway.response;
+package com.ltj.gateway.entity;
 
 import lombok.Data;
 
