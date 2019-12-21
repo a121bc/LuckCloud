@@ -108,7 +108,7 @@ public class SecurityConfig {
     private AuthenticationWebFilter bearerAuthenticationFilter(){
         AuthenticationWebFilter bearerAuthenticationFilter = new AuthenticationWebFilter(authManager);
         bearerAuthenticationFilter.setServerAuthenticationConverter(bearerConverter);
-        bearerAuthenticationFilter.setRequiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers("/api/**"));
+        bearerAuthenticationFilter.setRequiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers("/**"));
         return bearerAuthenticationFilter;
     }
 

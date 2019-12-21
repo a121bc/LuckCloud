@@ -26,18 +26,17 @@ public class RouteController extends BaseController<GatewayRoute, IGatewayRouteS
 
     @GetMapping("/refresh")
     public Mono<Result> refresh() {
-        gatewayServiceHandler.loadRouteConfig();
-        return Mono.just(Result.success("操作成功"));
+        return Mono.just(Result.success("操作成功")).doOnNext(e ->gatewayServiceHandler.loadRouteConfig());
     }
 
     @Override
     @PostMapping("/saveOrUpdate")
     public Mono<Result> saveOrUpdate(GatewayRoute entity) {
-        return super.saveOrUpdate(entity).doFinally((e) -> gatewayServiceHandler.loadRouteConfig());
+        return super.saveOrUpdate(entity).doOnNext(e -> gatewayServiceHandler.loadRouteConfig());
     }
 
     @GetMapping("/delete")
     public Mono<Result> delete(@PathVariable String id) throws Exception {
-        return super.delete(id).doFinally((e) -> gatewayServiceHandler.loadRouteConfig());
+        return super.delete(id).doOnNext(e -> gatewayServiceHandler.loadRouteConfig());
     }
 }
