@@ -6,11 +6,13 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ltj.gateway.entity.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
 @Data
 @TableName("gateway_route")
+@EqualsAndHashCode(callSuper = false)
 public class GatewayRoute extends BaseEntity {
 
     @TableId(type= IdType.AUTO)

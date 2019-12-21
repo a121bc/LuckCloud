@@ -4,6 +4,7 @@ import com.ltj.gateway.entity.permission.Button;
 import com.ltj.gateway.entity.permission.Menu;
 import com.ltj.gateway.entity.role.Role;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 import java.util.Set;
@@ -16,6 +17,7 @@ import java.util.Set;
  */
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class UserVo extends User {
 
     private Set<Role> roles;

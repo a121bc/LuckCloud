@@ -54,7 +54,8 @@ public class SecurityConfig {
 //            "/auth/login",
 //            "/auth/logout",
             "/health",
-            "/api/socket/**"
+            "/api/socket/**",
+            "/actuator/**"
     };
 
     @Bean

@@ -90,6 +90,13 @@ public class RedisService implements IRedisService<String, Object> {
     }
 
     @Override
+    public <K, V> Flux<V> getHashValues(String key) {
+        @SuppressWarnings("unchecked")
+        ReactiveHashOperations<String, K, V> opsForHash = redisTemplate.opsForHash();
+        return opsForHash.values(key);
+    }
+
+    @Override
     public <K, V> Mono<Long> deleteHashKeys(String key, Collection<K> hashKeys) {
         if (CollectionUtils.isEmpty(hashKeys)) {
             return Mono.just(0L);

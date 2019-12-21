@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -18,8 +19,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.time.Duration;
 
 /**
- * @author: Wang Chen Chen
- * @Date: 2018/11/16 9:33
+ * @author: Liu Tian Jun
+ * @Date: 2019/12/21 9:33
  * @describe：
  * @version: 1.0
  */
@@ -28,17 +29,17 @@ import java.time.Duration;
 @Slf4j
 @Configuration
 @EnableCaching
-@ConfigurationProperties(prefix = "spring.cache.redis")
+//@ConfigurationProperties(prefix = "spring.cache.redis")
 public class CacheConfiguration {
 
-    private Duration timeToLive = Duration.ZERO;
+    /*private Duration timeToLive = Duration.ZERO;
 
     public void setTimeToLive(Duration timeToLive) {
         log.info("timeToLive：{}", timeToLive);
         this.timeToLive = timeToLive;
-    }
+    }*/
 
-    @Bean
+    /*@Bean
     public RedisCacheManager cacheManager(LettuceConnectionFactory connectionFactory) {
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(this.timeToLive)
@@ -51,11 +52,11 @@ public class CacheConfiguration {
                 .build();
         log.debug("自定义RedisCacheManager加载完成");
         return redisCacheManager;
-    }
+    }*/
 
     @Bean(name = "reactiveRedisTemplate")
     @Primary
-    public ReactiveRedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory connectionFactory) {
+    public ReactiveRedisTemplate<String, Object> redisTemplate(ReactiveRedisConnectionFactory connectionFactory) {
         RedisSerializationContext<String, Object> serializationContext = RedisSerializationContext
                 .<String, Object>newSerializationContext()
                 .key(keySerializer())

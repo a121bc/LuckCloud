@@ -10,10 +10,12 @@ import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.filter.FilterDefinition;
 import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinition;
+import org.springframework.cloud.gateway.route.RouteDefinitionWriter;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.*;
@@ -40,6 +42,9 @@ public class GatewayServiceHandler implements ApplicationEventPublisherAware, Co
 
     @Autowired
     private GatewayRouteMapper gatewayRouteMapper;
+
+    @Autowired
+    private RouteDefinitionWriter routeDefinitionWriter;
 
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
@@ -82,6 +87,8 @@ public class GatewayServiceHandler implements ApplicationEventPublisherAware, Co
                 definition.setPredicates(Arrays.asList(predicate));
                 definition.setFilters(Arrays.asList(filterDefinition));
                 definition.setUri(uri);
+
+                routeDefinitionWriter.save(Mono.just(definition)).subscribe();
             });
         this.publisher.publishEvent(new RefreshRoutesEvent(this));
     }

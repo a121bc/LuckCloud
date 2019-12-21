@@ -35,6 +35,8 @@ public interface IRedisService<K, V> {
 
     <K, V> Flux<K> getHashKeys(String key);
 
+    <K, V> Flux<V> getHashValues(String key);
+
     <K, V> Mono<Long> deleteHashKeys(String key, Collection<K> hashKeys);
 
     Flux<Object> executeLuaScript(String luaScript, List<String> keys, List<String> values);
