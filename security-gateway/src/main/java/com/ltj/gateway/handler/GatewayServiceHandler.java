@@ -57,7 +57,7 @@ public class GatewayServiceHandler implements ApplicationEventPublisherAware, Co
     }
 
     public void loadRouteConfig() {
-        List<GatewayRoute> gatewayRoutes = gatewayRouteMapper.selectList(Wrappers.emptyWrapper());
+        List<GatewayRoute> gatewayRoutes = gatewayRouteMapper.selectEffectList();
         Optional.ofNullable(gatewayRoutes).orElse(Collections.emptyList())
             .forEach(gatewayRoute -> {
                 RouteDefinition definition = new RouteDefinition();

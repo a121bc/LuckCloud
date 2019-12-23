@@ -22,7 +22,7 @@ public class UserDetailsServiceImpl implements ReactiveUserDetailsService {
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         UserDetails user = userMapper.findByUsername(username);
-        return Mono.justOrEmpty(Optional.of(user))
+        return Mono.justOrEmpty(user)
                 .onErrorResume(e -> Mono.error(new UsernameNotFoundException("User Not Found")));
     }
 

@@ -15,4 +15,24 @@
         <result column="up_time" property="upTime" jdbcType="TIMESTAMP" />
         <result column="remarks" property="remarks" jdbcType="VARCHAR" />
     </resultMap>
+
+    <select id="selectEffectList" resultMap="BaseResultMap">
+        SELECT
+            r.id,
+            r.service_id,
+            r.state,
+            r.uri,
+            r.predicates,
+            r.filters,
+            r.`order`,
+            r.creator_id,
+            r.create_time,
+            r.updater_id,
+            r.up_time,
+            r.remarks
+        FROM
+            gateway_route AS r
+        WHERE
+            r.state = 1
+    </select>
 </mapper>
