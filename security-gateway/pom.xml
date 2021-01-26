@@ -12,10 +12,7 @@
     <artifactId>security-gateway</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
+
 
         <!-- 引入spring cloud gateway-->
         <dependency>
@@ -31,7 +28,7 @@
         <!-- 集成spring security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
+           <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
         <dependency>

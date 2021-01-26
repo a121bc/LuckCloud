@@ -53,6 +53,7 @@ public class SecurityConfig {
     private static final String[] AUTH_WHITELIST = {
 //            "/auth/login",
 //            "/auth/logout",
+            "/api/**",
             "/health",
             "/api/socket/**",
             "/actuator/**"

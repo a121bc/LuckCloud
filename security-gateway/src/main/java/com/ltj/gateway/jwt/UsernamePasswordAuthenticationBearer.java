@@ -51,7 +51,7 @@ public class UsernamePasswordAuthenticationBearer {
             return Mono.empty();
         }
         authorities = Stream.of(auths.split(","))
-                .map(a -> new SimpleGrantedAuthority(a))
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
             return Mono.justOrEmpty(new UsernamePasswordAuthenticationToken(subject, null, authorities));

@@ -1,6 +1,5 @@
 package com.ltj.gateway.handler;
 
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ltj.gateway.entity.gateway_route.GatewayRoute;
 import com.ltj.gateway.mapper.GatewayRouteMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -84,8 +83,8 @@ public class GatewayServiceHandler implements ApplicationEventPublisherAware, Co
                 filterParams.put(GENKEY_0, gatewayRoute.getFilters());
                 filterDefinition.setArgs(filterParams);
 
-                definition.setPredicates(Arrays.asList(predicate));
-                definition.setFilters(Arrays.asList(filterDefinition));
+                definition.setPredicates(Collections.singletonList(predicate));
+                definition.setFilters(Collections.singletonList(filterDefinition));
                 definition.setUri(uri);
 
                 routeDefinitionWriter.save(Mono.just(definition)).subscribe();
